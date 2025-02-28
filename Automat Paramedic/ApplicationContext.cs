@@ -16,9 +16,11 @@ namespace Automat_Paramedic
         public DbSet<Medicine> Medicines { get; set; }
         public DbSet<MedicineTransaction> MedicineTransaction { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<VaccinationRecord> VaccinationRecords { get; set; }
 
 
-                public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) { }
+
+        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) { }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -36,6 +38,7 @@ namespace Automat_Paramedic
             modelBuilder.ApplyConfiguration(new Config.MedicineTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new Config.MedicineConfiguration());
             modelBuilder.ApplyConfiguration(new Config.AppointmentConfiguration());
+            modelBuilder.ApplyConfiguration(new Config.VaccinationRecordConfiguration());
 
         }
 

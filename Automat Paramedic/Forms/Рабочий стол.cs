@@ -93,8 +93,7 @@ namespace Automat_Paramedic
             AddAppIcon("Журнал медикаментов", "medicines.png", typeof(MedicinesJournal));
             AddAppIcon("Google Chrome", "google.png", typeof(GoogleExplorerForm));
             AddAppIcon("Обращения", "request.png", typeof(AppointmentsForm));
-
-            
+            AddAppIcon("Вакцинация", "vac.png", typeof(VaccinationForm));
         }
 
         private void AddAppIcon(string text, string iconPath, Type formType)
