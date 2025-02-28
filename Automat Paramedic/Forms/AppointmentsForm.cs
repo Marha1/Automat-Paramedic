@@ -145,30 +145,47 @@ namespace Automat_Paramedic.Forms
         {
             try
             {
+                // Проверка на пустые поля
+                if (string.IsNullOrWhiteSpace(textBox1.Text) ||
+                    string.IsNullOrWhiteSpace(textBox2.Text) ||
+                    string.IsNullOrWhiteSpace(txtSymptoms.Text) ||
+                    string.IsNullOrWhiteSpace(txtTreatment.Text) ||
+                    string.IsNullOrWhiteSpace(txtRecommendations.Text) ||
+                    comboBoxMedicines.SelectedValue == null)
+                {
+                    MessageBox.Show("Заполните все поля!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-           
-            var newAppointment = new Appointment
-            {
-                FullName = textBox1.Text,
-                Group = textBox2.Text,
-                Date = dtpDate.Value.ToUniversalTime(),
-                Symptoms = txtSymptoms.Text,
-                Treatment = txtTreatment.Text,
-                Recommendations = txtRecommendations.Text,
-                MedicineId = (int)comboBoxMedicines.SelectedValue
-            };
+                // Проверка, является ли MedicineId корректным числом
+                if (!int.TryParse(comboBoxMedicines.SelectedValue?.ToString(), out int medicineId))
+                {
+                    MessageBox.Show("Выберите корректное лекарство!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-               await  _appointmentRepository.AddAsync(newAppointment);
-            
+                var newAppointment = new Appointment
+                {
+                    FullName = textBox1.Text.Trim(),
+                    Group = textBox2.Text.Trim(),
+                    Date = dtpDate.Value.ToUniversalTime(),
+                    Symptoms = txtSymptoms.Text.Trim(),
+                    Treatment = txtTreatment.Text.Trim(),
+                    Recommendations = txtRecommendations.Text.Trim(),
+                    MedicineId = medicineId
+                };
 
-            LoadAppointments();
-            ClearForm();
+                await _appointmentRepository.AddAsync(newAppointment);
+
+                LoadAppointments();
+                ClearForm();
             }
             catch (Exception)
             {
-                MessageBox.Show("Проверьте правильность всех данных");
+                MessageBox.Show("Произошла ошибка! Проверьте введённые данные и попробуйте снова.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private async void btnUpdate_Click(object sender, EventArgs e)
         {
@@ -187,6 +204,7 @@ namespace Automat_Paramedic.Forms
                 LoadAppointments();
             }
         }
+
 
         private async void btnDelete_Click(object sender, EventArgs e)
         {
