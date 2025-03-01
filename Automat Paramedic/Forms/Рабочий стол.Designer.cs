@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            desktopPanel = new Panel();
+            desktopPanel = new Primitives.BufferedPanel();
             SuspendLayout();
             // 
             // desktopPanel

@@ -9,35 +9,32 @@ using System.Net.NetworkInformation;
 using System.Windows.Forms;
 using System.Diagnostics;
 using Automat_Paramedic.Service;
+using Automat_Paramedic.Primitives;
 
 namespace Automat_Paramedic
 {
     public partial class Рабочий_стол : Form
     {
-        private Panel desktopPanel;
+        private BufferedPanel desktopPanel;
         private Panel taskbar;
-        private PictureBox volumeIcon; // Значок динамика
+        private PictureBox volumeIcon;
         private Label clockLabel;
         private PictureBox internetIcon;
         private System.Windows.Forms.Timer timer;
-        private Point _dragStartPoint; // Точка начала перетаскивания
-        private Panel _draggedPanel; // Перемещаемая панель иконки
-        private bool _isDragging = false; // Флаг для отслеживания перетаскивания
-        private List<Form> openPrograms; // Список открытых программ
-        private Dictionary<Form, Panel> programIcons; // Теперь словарь хранит Panel
+        private Point _dragStartPoint;
+        private Panel _draggedPanel;
+        private bool _isDragging = false;
+        private List<Form> openPrograms;
+        private Dictionary<Form, Panel> programIcons;
+        private int _lastIconX = 10;
+        private int _lastIconY = 10;
+        private const int IconSpacing = 10;
+        private Size internetIconSizeConnected = new Size(23, 23);
+        private Size internetIconSizeDisconnected = new Size(25, 25);
+        private Button startButton;
+        private ContextMenuStrip startMenu;
 
-        // Переменные для хранения позиции последней иконки
-        private int _lastIconX = 10; // Начальная позиция по X
-        private int _lastIconY = 10; // Начальная позиция по Y
-        private const int IconSpacing = 10; // Отступ между иконками
-
-        // Размеры иконки интернета
-        private Size internetIconSizeConnected = new Size(23, 23); // Размер иконки при подключенном интернете
-        private Size internetIconSizeDisconnected = new Size(25, 25); // Размер иконки при отключенном интернете
-
-        // Кнопка "Пуск" и меню
-        private Button startButton; // Кнопка "Пуск"
-        private ContextMenuStrip startMenu; // Контекстное меню для кнопки "Пуск"
+        private static readonly Dictionary<string, Image> _imageCache = new Dictionary<string, Image>();
 
         public Рабочий_стол()
         {
@@ -55,13 +52,20 @@ namespace Automat_Paramedic
         {
             try
             {
-                desktopPanel = new Panel
+                desktopPanel = new BufferedPanel
                 {
                     Dock = DockStyle.Fill,
                     AutoScroll = true,
                     BackgroundImageLayout = ImageLayout.Stretch
                 };
-                desktopPanel.BackgroundImage = Image.FromFile("background1.jpg");
+
+                LoadBackgroundImageAsync("background1.jpg").ContinueWith(t =>
+                {
+                    if (t.Result != null)
+                    {
+                        desktopPanel.BackgroundImage = t.Result;
+                    }
+                }, TaskScheduler.FromCurrentSynchronizationContext());
 
                 this.Controls.Add(desktopPanel);
                 AddAppIcons();
@@ -70,6 +74,32 @@ namespace Automat_Paramedic
             {
                 MessageBox.Show($"Ошибка загрузки интерфейса: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+        private async Task<Image> LoadBackgroundImageAsync(string path)
+        {
+            return await LoadCachedImageAsync(path);
+        }
+        private async Task<Image> LoadCachedImageAsync(string path)
+        {
+            if (_imageCache.ContainsKey(path))
+            {
+                return _imageCache[path];
+            }
+
+            var image = await Task.Run(() =>
+            {
+                if (File.Exists(path))
+                {
+                    return Image.FromFile(path);
+                }
+                return null;
+            });
+
+            if (image != null)
+            {
+                _imageCache[path] = image;
+            }
+            return image;
         }
 
         private Image LoadHighQualityButtonImage(string path, int width, int height)
@@ -521,7 +551,7 @@ namespace Automat_Paramedic
 
         private void Рабочий_стол_Load(object sender, EventArgs e)
         {
-            
+
         }
     }
 }
