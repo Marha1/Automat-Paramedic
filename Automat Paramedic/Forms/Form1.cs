@@ -12,158 +12,130 @@ namespace Automat_Paramedic
         private readonly ApplicationContextFactory _contextFactory;
         private readonly string _username = "Medic";
 
+        private PictureBox loader;
+        private TextBox txtPassword;
+        private Label lblError;
+        private Button btnLogin;
+
         public Form1()
         {
             _contextFactory = new ApplicationContextFactory();
             InitializeComponent();
+
+            this.DoubleBuffered = true;
         }
 
         private async void Form1_Load(object sender, EventArgs e)
         {
-            // Открываем форму во весь экран
             this.WindowState = FormWindowState.Maximized;
+            this.FormBorderStyle = FormBorderStyle.None;
 
-            // Асинхронная инициализация интерфейса
             await SetupUIAsync();
         }
 
         private async Task SetupUIAsync()
         {
-            // Настройка формы
-            this.BackgroundImage = await LoadImageAsync("back_auth.jpg");
-            this.BackgroundImageLayout = ImageLayout.Stretch;
-            this.FormBorderStyle = FormBorderStyle.None;
+            var images = await Task.WhenAll(
+                LoadImageAsync("back_auth.jpg"),
+                LoadImageAsync("avatar.jpg"),
+                LoadImageAsync("ZZ5H.gif"),
+                LoadImageAsync("windows_15242.png")
+            );
 
-            // Центрирование элементов по вертикали
+            this.BackgroundImage = images[0];
+            this.BackgroundImageLayout = ImageLayout.Stretch;
+
+            int centerX = this.ClientSize.Width / 2;
             int centerY = this.ClientSize.Height / 2;
 
-            // Аватар пользователя
-            PictureBox avatar = new PictureBox
-            {
-                Image = await LoadImageAsync("avatar.jpg"),
-                Size = new Size(100, 100),
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                BackColor = Color.Transparent // Прозрачный фон
-            };
-            avatar.Location = new Point((this.ClientSize.Width - avatar.Width) / 2, centerY - 120); // Центрирование по горизонтали и вертикали
+            // Аватар
+            var avatar = CreatePictureBox(images[1], new Size(100, 100), new Point(centerX - 50, centerY - 120));
             Controls.Add(avatar);
 
             // Имя пользователя
-            Label lblUsername = new Label
-            {
-                Text = _username,
-                AutoSize = true,
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
-                ForeColor = Color.White,
-                BackColor = Color.Transparent // Прозрачный фон
-            };
-            lblUsername.Location = new Point((this.ClientSize.Width - lblUsername.Width) / 2, centerY - 50); // Центрирование по горизонтали и вертикали
+            var lblUsername = CreateLabel(_username, new Font("Segoe UI", 12, FontStyle.Bold), centerX, centerY - 50);
             Controls.Add(lblUsername);
 
-            // Поле для ввода пароля
-            TextBox txtPassword = new TextBox
+            // Поле ввода пароля
+            txtPassword = new TextBox
             {
                 PasswordChar = '*',
                 Size = new Size(200, 30),
                 BackColor = Color.FromArgb(240, 240, 240),
-                BorderStyle = BorderStyle.FixedSingle
+                BorderStyle = BorderStyle.FixedSingle,
+                Location = new Point(centerX - 100, centerY)
             };
-            txtPassword.Location = new Point((this.ClientSize.Width - txtPassword.Width) / 2, centerY); // Центрирование по горизонтали и вертикали
             Controls.Add(txtPassword);
 
-            // Гифка загрузки (увеличиваем размер и центрируем)
-            PictureBox loader = new PictureBox
-            {
-                Image = await LoadImageAsync("Iphone-spinner-2.gif"),
-                Size = new Size(64, 64), // Увеличиваем размер гифки
-                Visible = false,
-                BackColor = Color.Transparent // Прозрачный фон
-            };
-            loader.Location = new Point((this.ClientSize.Width - loader.Width) / 2, centerY + 50); // Центрирование по горизонтали и вертикали
+            // Гифка загрузки
+            loader = CreatePictureBox(images[2], new Size(32, 32), new Point(centerX - 16, centerY + 50));
+            loader.Visible = false;
             Controls.Add(loader);
 
             // Кнопка входа
-            Button btnLogin = new Button
+             btnLogin = new Button
             {
                 Text = "→",
-                Size = new Size(40, 30),
+                Size = new Size(50, 35), 
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(51, 153, 255),
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
-                TextAlign = ContentAlignment.MiddleCenter // Выравнивание текста по центру
+                Font = new Font("Segoe UI", 14, FontStyle.Bold), 
+                TextAlign = ContentAlignment.MiddleCenter,
+                Location = new Point(txtPassword.Right + 10, txtPassword.Top) 
             };
-            btnLogin.Location = new Point((this.ClientSize.Width - btnLogin.Width) / 2, centerY + 100); // Центрирование по горизонтали и вертикали
             btnLogin.FlatAppearance.BorderSize = 0;
             btnLogin.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 122, 204);
+            btnLogin.Click += BtnLogin_Click;
             Controls.Add(btnLogin);
 
             // Сообщение об ошибке
-            Label lblError = new Label
-            {
-                Text = "Неверный пароль!",
-                AutoSize = true,
-                ForeColor = Color.Red,
-                Visible = false,
-                BackColor = Color.Transparent // Прозрачный фон
-            };
-            lblError.Location = new Point((this.ClientSize.Width - lblError.Width) / 2, centerY + 140); // Центрирование по горизонтали и вертикали
+            lblError = CreateLabel("Неверный пароль!", new Font("Segoe UI", 10, FontStyle.Bold), centerX, centerY + 140);
+            lblError.ForeColor = Color.Red;
+            lblError.Visible = false;
             Controls.Add(lblError);
 
-            // Подпись внизу
-            Label lblFooter = new Label
-            {
-                Text = "Windows 7 by marhal",
-                AutoSize = true,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                ForeColor = Color.White,
-                BackColor = Color.Transparent // Прозрачный фон
-            };
-            lblFooter.Location = new Point((this.ClientSize.Width - lblFooter.Width) / 2, this.ClientSize.Height - 50); // Внизу по центру
+            // Подпись "Windows 7 by marhal"
+            var lblFooter = CreateLabel("Windows 7 by Marhal", new Font("Segoe UI", 10, FontStyle.Bold), centerX, this.ClientSize.Height - 50);
             Controls.Add(lblFooter);
 
             // Иконка Windows 7
-            PictureBox windowsIcon = new PictureBox
-            {
-                Image = await LoadImageAsync("windows_15242.png"),
-                Size = new Size(20, 20),
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                BackColor = Color.Transparent // Прозрачный фон
-            };
-            windowsIcon.Location = new Point(lblFooter.Left - windowsIcon.Width - 5, lblFooter.Top); // Слева от подписи
+            var windowsIcon = CreatePictureBox(images[3], new Size(20, 20), new Point(lblFooter.Left - 25, lblFooter.Top));
             Controls.Add(windowsIcon);
+        }
 
-            // Обработчик клика по кнопке входа
-            btnLogin.Click += async (sender, e) =>
+        private async void BtnLogin_Click(object sender, EventArgs e)
+        {
+            txtPassword.Visible = false;
+            loader.Visible = true;
+            btnLogin.Visible = false;   
+            lblError.Visible = false;
+            ((Button)sender).Enabled = false;
+
+            await Task.Delay(2000); 
+
+            bool isValid = await CheckPassword(txtPassword.Text);
+
+            txtPassword.Visible = true;
+            loader.Visible = false;
+            ((Button)sender).Enabled = true;
+
+            if (isValid)
             {
-                // Скрываем TextBox и показываем GIF
-                txtPassword.Visible = false;
-                loader.Visible = true;
-                btnLogin.Enabled = false;
-                lblError.Visible = false;
+                MessageBox.Show($"Добро пожаловать, {_username}!", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Задержка 1.5-2 секунды
-                await Task.Delay(1500); // 1.5 секунды
 
-                // Проверяем пароль
-                bool isValid = await CheckPassword(txtPassword.Text);
-
-                // Возвращаем TextBox и скрываем GIF
-                txtPassword.Visible = true;
-                loader.Visible = false;
-                btnLogin.Enabled = true;
-
-                if (isValid)
-                {
-                    MessageBox.Show($"Добро пожаловать, {_username}!", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    Application.Exit();
-                }
-                else
-                {
-                    lblError.Visible = true;
-                    txtPassword.Clear();
-                }
-            };
+                var form = new Рабочий_стол();
+                form.ShowDialog();
+                
+                this.Hide();
+            }
+            else
+            {
+                lblError.Visible = true;
+                btnLogin.Visible = true;
+                txtPassword.Clear();
+            }
         }
 
         private async Task<Image> LoadImageAsync(string path)
@@ -174,8 +146,36 @@ namespace Automat_Paramedic
         private async Task<bool> CheckPassword(string password)
         {
             using var _application = _contextFactory.CreateDbContext();
-
             return await _application.Users.AnyAsync(u => u.Login == _username && u.password == password);
+        }
+
+        private PictureBox CreatePictureBox(Image image, Size size, Point location)
+        {
+            return new PictureBox
+            {
+                Image = image,
+                Size = size,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                BackColor = Color.Transparent,
+                Location = location
+            };
+        }
+
+        private Label CreateLabel(string text, Font font, int centerX, int posY)
+        {
+            var label = new Label
+            {
+                Text = text,
+                Font = font,
+                ForeColor = Color.White,
+                BackColor = Color.Transparent,
+                AutoSize = true
+            };
+
+            label.Left = centerX - (label.PreferredWidth / 2);
+            label.Top = posY;
+
+            return label;
         }
     }
 }

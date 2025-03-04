@@ -12,9 +12,11 @@ namespace Automat_Paramedic.Service
             {
                 using (var ping = new Ping())
                 {
-                    var reply = await ping.SendPingAsync("8.8.8.8", 1000);
-                    return reply.Status == IPStatus.Success;
+                    
+                        var reply = await ping.SendPingAsync("8.8.8.8", 1000);
+                        return reply.Status == IPStatus.Success;
                 }
+                    
             }
             catch
             {

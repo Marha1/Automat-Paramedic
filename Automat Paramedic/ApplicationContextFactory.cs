@@ -1,16 +1,22 @@
 ﻿using Automat_Paramedic.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Automat_Paramedic.Repository
 {
     public class ApplicationContextFactory
     {
-        private readonly string _connectionString = @"host=localhost;port=5432;database=med;username=postgres;password=053352287";
-
         public ApplicationContext CreateDbContext()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
-            optionsBuilder.UseNpgsql(_connectionString);
+            var configuration = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetCurrentDirectory()) // Указываем путь к папке проекта
+               .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+               .Build();
+
+            string connectionString = configuration.GetConnectionString("DefaultConnection");
+
+            optionsBuilder.UseNpgsql(connectionString);
             return new ApplicationContext(optionsBuilder.Options);
         }
     }

@@ -53,11 +53,11 @@
             label5 = new Label();
             panel1 = new Panel();
             panel2 = new Panel();
-            txtSearch = new TextBox();
-            btnSearch = new Button();
+            btnView = new Button();
             cmbExportType = new ComboBox();
             btnExport = new Button();
-            btnView = new Button();
+            txtSearch = new TextBox();
+            btnSearch = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView).BeginInit();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -69,6 +69,7 @@
             dataGridView.Dock = DockStyle.Fill;
             dataGridView.Location = new Point(0, 0);
             dataGridView.Name = "dataGridView";
+            dataGridView.RowHeadersWidth = 51;
             dataGridView.Size = new Size(800, 250);
             dataGridView.TabIndex = 0;
             // 
@@ -166,7 +167,7 @@
             label3.AutoSize = true;
             label3.Location = new Point(220, 10);
             label3.Name = "label3";
-            label3.Size = new Size(162, 20);
+            label3.Size = new Size(196, 20);
             label3.TabIndex = 11;
             label3.Text = "Хронические заболевания";
             // 
@@ -175,7 +176,7 @@
             label4.AutoSize = true;
             label4.Location = new Point(220, 60);
             label4.Name = "label4";
-            label4.Size = new Size(74, 20);
+            label4.Size = new Size(76, 20);
             label4.TabIndex = 12;
             label4.Text = "Аллергии";
             // 
@@ -184,7 +185,7 @@
             label5.AutoSize = true;
             label5.Location = new Point(430, 10);
             label5.Name = "label5";
-            label5.Size = new Size(74, 20);
+            label5.Size = new Size(79, 20);
             label5.TabIndex = 13;
             label5.Text = "Прививки";
             // 
@@ -222,23 +223,17 @@
             panel2.Name = "panel2";
             panel2.Size = new Size(800, 200);
             panel2.TabIndex = 15;
+            panel2.Paint += panel2_Paint;
             // 
-            // txtSearch
+            // btnView
             // 
-            txtSearch.Location = new Point(10, 10);
-            txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(200, 27);
-            txtSearch.TabIndex = 16;
-            // 
-            // btnSearch
-            // 
-            btnSearch.Location = new Point(220, 10);
-            btnSearch.Name = "btnSearch";
-            btnSearch.Size = new Size(80, 27);
-            btnSearch.TabIndex = 17;
-            btnSearch.Text = "Поиск";
-            btnSearch.UseVisualStyleBackColor = true;
-            btnSearch.Click += btnSearch_Click;
+            btnView.Location = new Point(630, 120);
+            btnView.Name = "btnView";
+            btnView.Size = new Size(94, 29);
+            btnView.TabIndex = 20;
+            btnView.Text = "Просмотр";
+            btnView.UseVisualStyleBackColor = true;
+            btnView.Click += btnView_Click;
             // 
             // cmbExportType
             // 
@@ -260,15 +255,22 @@
             btnExport.UseVisualStyleBackColor = true;
             btnExport.Click += btnExport_Click;
             // 
-            // btnView
+            // txtSearch
             // 
-            btnView.Location = new Point(630, 120);
-            btnView.Name = "btnView";
-            btnView.Size = new Size(94, 29);
-            btnView.TabIndex = 20;
-            btnView.Text = "Просмотр";
-            btnView.UseVisualStyleBackColor = true;
-            btnView.Click += btnView_Click;
+            txtSearch.Location = new Point(10, 10);
+            txtSearch.Name = "txtSearch";
+            txtSearch.Size = new Size(200, 27);
+            txtSearch.TabIndex = 16;
+            // 
+            // btnSearch
+            // 
+            btnSearch.Location = new Point(220, 10);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(80, 27);
+            btnSearch.TabIndex = 17;
+            btnSearch.Text = "Поиск";
+            btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Click += btnSearch_Click;
             // 
             // MedicalRecordsForm
             // 

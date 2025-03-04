@@ -92,19 +92,27 @@ namespace Automat_Paramedic.Forms
 
         private async void btnCreate_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(txtFullName.Text)  ||
+                dtpDateOfBirth.Value == DateTime.MinValue)
+            {
+                MessageBox.Show("Все поля должны быть заполнены!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             var newRecord = new MedicalRecord
             {
-                FullName = txtFullName.Text,
+                FullName = txtFullName.Text.Trim(),
                 DateOfBirth = dtpDateOfBirth.Value.ToUniversalTime(),
-                ChronicDiseases = txtChronicDiseases.Text,
-                Allergies = txtAllergies.Text,
-                Vaccinations = txtVaccinations.Text
+                ChronicDiseases = txtChronicDiseases.Text.Trim(),
+                Allergies = txtAllergies.Text.Trim(),
+                Vaccinations = txtVaccinations.Text.Trim()
             };
 
             await _repository.AddAsync(newRecord);
-            LoadDataAsync();
+             LoadDataAsync();
             ClearForm();
         }
+
 
         private async void btnUpdate_Click(object sender, EventArgs e)
         {
@@ -174,6 +182,11 @@ namespace Automat_Paramedic.Forms
             {
                 MessageBox.Show("Выберите запись для просмотра.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
