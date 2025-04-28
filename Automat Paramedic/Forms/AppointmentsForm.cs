@@ -50,7 +50,7 @@ namespace Automat_Paramedic.Forms
         private async void LoadAppointments()
         {
             
-                var appointments = await _appointmentRepository.GetAllAsync();
+                var appointments = await _appointmentRepository.GetAllWithMedicineAsync();
 
                 dataGridView.Columns.Clear();
                 dataGridView.Rows.Clear();
@@ -172,7 +172,7 @@ namespace Automat_Paramedic.Forms
                     Symptoms = txtSymptoms.Text.Trim(),
                     Treatment = txtTreatment.Text.Trim(),
                     Recommendations = txtRecommendations.Text.Trim(),
-                    MedicineId = medicineId
+                    MedicineId = medicineId,
                 };
 
                 await _appointmentRepository.AddAsync(newAppointment);
@@ -210,10 +210,7 @@ namespace Automat_Paramedic.Forms
         {
             if (_selectedAppointment != null)
             {
-                
                  await   _appointmentRepository.DeleteAsync(_selectedAppointment);
-               
-                _appointments.Remove(_selectedAppointment);
                 LoadAppointments();
                 ClearForm();
             }

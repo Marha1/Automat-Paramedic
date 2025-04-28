@@ -12,6 +12,7 @@ namespace Automat_Paramedic.Models
         public string Login { get; set; }
         public string password { get; set; }
         public string AvatarPath { get; set; }
+        public string Email { get; set; }
 
     }
 }

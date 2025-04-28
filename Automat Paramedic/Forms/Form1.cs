@@ -1,4 +1,5 @@
 ﻿using Automat_Paramedic.Repository;
+using Automat_Paramedic.Service;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Drawing;
@@ -11,6 +12,7 @@ namespace Automat_Paramedic
     {
         private readonly ApplicationContextFactory _contextFactory;
         private readonly string _username = "Medic";
+        private readonly EmailService _emailService;
 
         private PictureBox loader;
         private TextBox txtPassword;
@@ -21,7 +23,7 @@ namespace Automat_Paramedic
         {
             _contextFactory = new ApplicationContextFactory();
             InitializeComponent();
-
+            _emailService = new EmailService(_contextFactory);
             this.DoubleBuffered = true;
         }
 
@@ -67,6 +69,22 @@ namespace Automat_Paramedic
             };
             Controls.Add(txtPassword);
 
+            var lblForgotPassword = new LinkLabel
+            {
+                Text = "Забыли пароль?",
+                Location = new Point(txtPassword.Left, txtPassword.Bottom + 5),
+                AutoSize = true,
+                ForeColor = Color.LightGray,
+                BackColor = Color.Transparent,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                Cursor = Cursors.Hand
+            };
+            lblForgotPassword.Click += LblForgotPassword_Click;
+            Controls.Add(lblForgotPassword);
+
+            // Добавляем эффект при наведении
+            lblForgotPassword.MouseEnter += (s, e) => lblForgotPassword.ForeColor = Color.White;
+            lblForgotPassword.MouseLeave += (s, e) => lblForgotPassword.ForeColor = Color.LightGray;
             // Гифка загрузки
             loader = CreatePictureBox(images[2], new Size(32, 32), new Point(centerX - 16, centerY + 50));
             loader.Visible = false;
@@ -102,6 +120,55 @@ namespace Automat_Paramedic
             // Иконка Windows 7
             var windowsIcon = CreatePictureBox(images[3], new Size(20, 20), new Point(lblFooter.Left - 25, lblFooter.Top));
             Controls.Add(windowsIcon);
+        }
+        private async void LblForgotPassword_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Запрашиваем email пользователя
+                string email = Microsoft.VisualBasic.Interaction.InputBox(
+                    "Введите ваш email для восстановления пароля:",
+                    "Восстановление пароля",
+                    "");
+
+                if (string.IsNullOrWhiteSpace(email))
+                    return MessageBox.Show("Почта не может быть пустой");
+
+                loader.Visible = true;
+                btnLogin.Enabled = false;
+                txtPassword.Enabled = false;
+
+                // Используем существующий сервис
+                bool result = await _emailService.SendResetPasswordEmailAsync (email);
+
+                if (result)
+                {
+                    MessageBox.Show("Инструкции по восстановлению пароля были отправлены на вашу почту.",
+                                  "Письмо отправлено",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Не удалось отправить письмо. Проверьте правильность email или обратитесь к администратору.",
+                                  "Ошибка",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка: {ex.Message}",
+                              "Ошибка",
+                              MessageBoxButtons.OK,
+                              MessageBoxIcon.Error);
+            }
+            finally
+            {
+                loader.Visible = false;
+                btnLogin.Enabled = true;
+                txtPassword.Enabled = true;
+            }
         }
 
         private async void BtnLogin_Click(object sender, EventArgs e)

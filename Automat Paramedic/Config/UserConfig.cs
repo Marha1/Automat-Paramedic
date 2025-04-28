@@ -17,6 +17,7 @@ namespace Automat_Paramedic.Config
                 builder.HasKey(b => b.Id);
                 builder.Property(b => b.Login).IsRequired();
                 builder.Property(b => b.password).IsRequired();
+                builder.Property(builder => builder.Email).IsRequired();
                 
             }
         
