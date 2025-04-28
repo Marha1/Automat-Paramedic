@@ -132,7 +132,10 @@ namespace Automat_Paramedic
                     "");
 
                 if (string.IsNullOrWhiteSpace(email))
-                    return MessageBox.Show("Почта не может быть пустой");
+                {
+                    MessageBox.Show("Почта не может быть пустой");
+                    return;
+                }
 
                 loader.Visible = true;
                 btnLogin.Enabled = false;
